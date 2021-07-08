@@ -77,4 +77,8 @@ def get_parser():
         type=get_hook_function,
         help="Optional hook to extend the '_context' object with custom information, e.g. to base decisions on external systems",
     )
+    parser.add_argument(
+        "--slack-webhook-url",
+        help="Webhook URL to push logging messages to Slack.",
+    )
     return parser

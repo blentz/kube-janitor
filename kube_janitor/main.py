@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import sys
 import time
 from typing import Callable
 from typing import Optional
@@ -18,7 +19,20 @@ def main(args=None):
     parser = cmd.get_parser()
     args = parser.parse_args(args)
 
+    std = logging.StreamHandler(sys.stdout)
+    logHandlers = [std]
+
+    if args.slack_webhook_url:
+        from slack_logger import SlackHandler, SlackFormatter
+        sh = SlackHandler(username='kube-janitor',
+                          icon_emoji=':robot_face:',
+                          url=args.slack_webhook_url)
+        sh.addFilter(lambda x: x.levelno != logging.DEBUG)
+        sh.setFormatter(SlackFormatter())
+        logHandlers.append(sh)
+
     logging.basicConfig(
+        handlers=logHandlers,
         format="%(asctime)s %(levelname)s: %(message)s",
         level=logging.DEBUG if args.debug else logging.INFO,
     )
